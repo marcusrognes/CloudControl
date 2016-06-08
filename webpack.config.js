@@ -15,6 +15,7 @@ module.exports = {
     output: {
         filename: './dist/[name].js'
     },
+    target: 'node-webkit',
     devtool: getDevTool(),
     module: {
         loaders: [

@@ -1,4 +1,4 @@
-const newUUID = ()=> {
+const newUUID = function () {
     var d = new Date().getTime();
     if (window.performance && typeof window.performance.now === "function") {
         d += performance.now(); //use high-precision timer if available
@@ -19,7 +19,12 @@ class DB {
     }
 
     loadData() {
-        var data = JSON.parse(localStorage[this.name]);
+        var data = {};
+
+        try {
+            data = JSON.parse(localStorage[this.name])
+        } catch (e) {
+        }
 
         if (data.collections) {
             return data;
@@ -50,7 +55,7 @@ class DB {
         this.collections[name] = options || {};
 
         var rawCollections = this.data.collections || {};
-        var rawCollection = rawCollections[name];
+        var rawCollection = rawCollections[name] || {};
 
         var rawData = rawCollection.data || [];
 
@@ -85,7 +90,11 @@ class Collection {
 
         array._database = {};
         array._name = '';
+        array._subCollection = false;
         array.__proto__.insert = this.insert;
+        array.__proto__.find = this.find;
+        array.__proto__._findById = this._findById;
+        array.__proto__._findByObject = this._findByObject;
 
         return array;
     }
@@ -96,6 +105,59 @@ class Collection {
         this._database.updateCollection(this);
         return doc._id;
     }
+
+    find(filter) {
+        if (typeof filter == 'object') {
+            return this._findByObject(filter);
+        } else {
+            return this._findById(filter);
+        }
+    }
+
+    _findById(id) {
+        var subCollection = new Collection();
+        subCollection._subCollection = true;
+
+        for (var itemKey = 0; itemKey < this.length; itemKey++) {
+            if (this[itemKey]._id == id) {
+                subCollection.push(this[itemKey]);
+                break;
+            }
+        }
+
+        return subCollection;
+    }
+
+    _findByObject(objectFilter) {
+        var subCollection = new Collection();
+        subCollection._subCollection = true;
+
+        for (var itemKey = 0; itemKey < this.length; itemKey++) {
+            var insert = true;
+            for (var filterKey in objectFilter) {
+                if (typeof objectFilter[filterKey] == 'object') {
+                    if (!this._handleExpression(this[itemKey][filterKey], objectFilter[filterKey], this, objectFilter, itemKey, filterKey)) {
+                        insert = false;
+                    }
+                }
+
+                if (this[itemKey][filterKey] != objectFilter[filterKey]) {
+                    insert = false;
+                }
+            }
+
+            if (insert) {
+                subCollection.push(this[itemKey]);
+            }
+        }
+
+        return subCollection;
+    }
+
+    _handleExpression(value, check, collection, filter, key, expression) {
+
+    }
+
 }
 
 
@@ -104,4 +166,3 @@ export default DB;
 export {
     Collection
 };
-

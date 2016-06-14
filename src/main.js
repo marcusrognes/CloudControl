@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import style from './main.scss';
+import './main.scss';
 
 import DB from './settings/DB';
 
 var Database = new DB('CloudControl');
 
 var Servers = Database.addCollection('servers');
+
+console.log(Servers.find('5813e44a-3cc8-4edd-aec1-605c43fd44c6'));
 
 class App extends Component {
     render() {

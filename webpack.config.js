@@ -5,7 +5,7 @@ function getDevTool() {
         return 'source-map'; //enables source map
     }
 
-    return false;
+    return 'source-map'; // Should be false in production
 }
 
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
         filename: './dist/[name].js'
     },
     target: 'node-webkit',
-    devtool: getDevTool(),
+    devtool: 'source-map',
     module: {
         loaders: [
             {

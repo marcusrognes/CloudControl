@@ -28,8 +28,8 @@
     "webpack-dev-server": "^1.14.0"
   },
   "scripts": {
-    "build": "./node_modules/webpack/bin/webpack.js -p",
-    "start": "webpack -p --watch",
+    "build": "webpack -p",
+    "start": "webpack -d --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
